@@ -85,7 +85,7 @@ def download_themis_images(date:datetime, asi:str, save_dir:str):
         os.makedirs(save_asi_dir)
 
     # Does a temporary directory for raw images and skymap files exist?
-    tmp_dir = save_asi_dir + 'tmp/'
+    tmp_dir = save_asi_dir
     if not os.path.exists(tmp_dir):
         os.makedirs(tmp_dir)
 
@@ -128,8 +128,8 @@ def download_themis_images(date:datetime, asi:str, save_dir:str):
     logging.info('Finished download script for {} and {}.'.format(asi, date.date()))
 
 
-def themis_asi_to_hdf5_8bit_clahe(date:datetime, asi:str, save_dir, del_files:bool = False,
-                                  workers:int=1):
+def themis_asi_to_hdf5_8bit_clahe(date:datetime, asi:str, save_dir:str, h5_dir:str,
+                                  del_files:bool = False, workers:int=1):
     """Function to convert themis asi images
     to 8-bit grayscale images and then write them to an h5 file using
     contrast limited adaptive historgram equalization (CLAHE).
@@ -164,10 +164,14 @@ def themis_asi_to_hdf5_8bit_clahe(date:datetime, asi:str, save_dir, del_files:bo
     logging.info('Starting h5 file creation script for {} and {}...'.format(asi,
                                                                             date.date()))
 
-    h5file = save_dir + asi + '/all-images-' + str(date.date()) + '-' + asi + '.h5'
+    # Check if directory to store h5 files exists
+    if not os.path.exists(h5_dir):
+        os.makedirs(h5_dir)
+
+    h5file = h5_dir + '/all-images-' + str(date.date()) + '-' + asi + '.h5'
     
     # Directory with images
-    tmp_img_dir = save_dir + asi + '/tmp/' + str(date.date()) + '/'
+    tmp_img_dir = save_dir + asi + '/' + str(date.date()) + '/'
     
     if not os.path.exists(tmp_img_dir):
         logging.critical('Images are not downloaded. Try running download_themis_images.')

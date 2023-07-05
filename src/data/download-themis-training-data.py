@@ -9,8 +9,12 @@ science@rileytroyer.com
 """
 # Import needed libraries
 from datetime import datetime
+from dateutil import parser
 import pandas as pd
+from pathlib import Path
 import logging
+import numpy as np
+import sys
 
 # Add root to path
 path_root = Path(__file__).parents[2]
@@ -39,64 +43,80 @@ logging.basicConfig(filename=logs_dir + f'download-themis-training-data-{datetim
 # - ML Batch 2022-11-20-strong-pa
 # - ML Batch 2023-02-01
 
-classification_dir = 'data/processed/classifications/'
+classification_dir = 'docs/classifications/'
 
-b20220901 = classification_dir + 'classification-09092022 updated.xlsx'
-b20221017 = classification_dir + 'classification-10012022.xlsx'
-b20221120 = classification_dir + 'classification-11202022.xlsx'
-b20230201 = classification_dir + 'classification-02012023.xlsx'
+b20220901 = classification_dir + 'themis/classification-09092022 updated.xlsx'
+b20221017 = classification_dir + 'themis/classification-10012022.xlsx'
+b20221120 = classification_dir + 'themis/classification-11202022.xlsx'
+b20230201 = classification_dir + 'themis/classification-02012023.xlsx'
 
 strfiles = [b20220901, b20221017, b20221120, b20230201]
 
 days_list = []
 asis_list = []
 
+logging.info('Reading in classification files.')
+
 # Read in classification csvs and combine into one full dataframe
 for strfile in strfiles:
 
-    classification_csv = pd.read_excel(strfile, header=0, skiprows=0, sheet_name='themis')
-    days_list.extend(list(classification_csv['date'].astype(str)))
+    classification_csv = pd.read_excel(strfile, sheet_name='themis')
+
+    # Check format of date
+    if type(classification_csv['Date'][0]) == str:
+        days = [parser.isoparse(d) for d in classification_csv['Date']]
+
+    else:
+        days = [datetime(int(d[0:4]), int(d[4:6]), int(d[6:8]))
+                for d in classification_csv['Date'].astype(str)]
+
+
+    # Add days to master list
+    days_list.extend(days)
+
+    # Also extend asis
     asis_list.extend(list(classification_csv['camera']))
 
 # Create a new column to combine station and date
 days_list = np.array(days_list)
 asis_list = np.array(asis_list)
 
-last_date = datetime(1000, 1, 1).date()
+last_date = datetime(1000, 1, 1)
 last_asi = '0000'
-
-for n in range(0, len(days_list)):
-
-    date_str = days_list[n]
-    asi = asis_list[n]
-
-    date = datetime(int(date[0:4]), int(date[4:6]), int(date[6:8]))
-
-    if (date == last_date) & (asi == last_asi):
-        continue
-
-    
 
 # Loop through each day, download, and create .h5 file
 logging.info('Starting download and processing for all days.')
 
-for day in days_list[0:1]:
-    
-    try: 
-        # Download the images to the raw directory
-        # You can use significantly more processes than cpu cores to speed this up
-        download_pfrr_images(day, save_dir=data_dir+'raw/pfrr-asi/',
-                            wavelength='558', processes=25)
-    except Exception as e:
-        logging.critical(f'Unable to download files for {day}. Stopped with error {e}')
-    
-    try:
-        # Create the hdf5 file
-        # Using more processes than cpu cores will slow this down
-        pfrr_asi_to_hdf5_8bit_clahe(day, save_base_dir=data_dir+'interim/pfrr-asi-h5/',
-                                    img_base_dir=data_dir+'raw/pfrr-asi/',
-                                    wavelength='558', del_files=False, processes=4)
-    except Exception as e:
-        logging.critical(f'Unable to create h5 file for {day}. Stopped with error {e}')
+for n in range(0, len(days_list)):
 
-logging.info('Finished downloading and processing all days.')
+    date = days_list[n]
+    asi = asis_list[n]
+
+    if (date.date() == last_date.date()) & (asi == last_asi):
+        continue
+
+    logging.info(f'Downloading images for {date} and {asi} to data/raw/training/themis/.')
+    # Download images
+    try:
+        download_themis_images(date, asi, 'data/raw/training/themis/')
+
+    except Exception as e:
+        logging.critical(f'Unable to download files for {date} and {asi}. Stopped with error {e}') 
+
+    logging.info(f'Images downloaded. Starting to process images.')
+    # Process images
+    try:
+        themis_asi_to_hdf5_8bit_clahe(date, asi,
+                                      save_dir='data/raw/training/themis/',
+                                      h5_dir='data/interim/training/themis/')  
+    
+    except Exception as e:
+        logging.critical(f'Unable to process files for {date} and {asi}. Stopped with error {e}')
+
+    last_date = date
+    last_asi = asi
+
+    logging.info(f'Images processed. They are available at data/interim/training/themis/.')
+
+
+logging.info('All images downloaded and processed.')

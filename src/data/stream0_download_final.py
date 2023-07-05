@@ -16,7 +16,7 @@ if __name__ == '__main__':
                  datetime.now().strftime("%H:%M:%S"))
 
     # import files
-    objects = 'data/processed/classifications/classification-03022023.xlsx'
+    objects = 'docs/classifications/classification-03022023.xlsx'
 
     # preview files
     file = pd.read_excel(objects, header=0, skiprows=1)

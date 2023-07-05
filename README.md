@@ -20,5 +20,13 @@ This will mirror THEMIS images located at: https://data.phys.ucalgary.ca/sort_by
 
 These images will be downloaded to the directory data/raw/testing/stream0
 
+To download THEMIS data you will need to have rsync installed on your system. As this isn't available in Windows. If you are on a Windows system you will either need to run this from the virtual linux environment (WSL) or create a virtual machine.
+
+For the PFRR images you will need to have wget installed.
+
 ### Training data
-The training data needs to be human classified first, so we preprocess it and put it into an h5 file format that makes transporting it and creating videos easier. 
+The training data needs to be human classified first, so we preprocess it and put it into an h5 file format that makes transporting it and creating videos easier.
+
+To download all of the THEMIS training data run: src/data/download-themis-training-data.py
+
+To downloadd all of the PFRR training data run: src/data/download-pfrr-training-data.py
