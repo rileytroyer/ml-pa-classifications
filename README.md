@@ -2,12 +2,14 @@
 see document-struture.md for a layout of the project structure and where files are located
 you will need to create reports/figures/, logs/, and data/ directories as these are included in my .gitignore file.
 
+NOTE: The code and documents located within calgary-version/ are specifically designed to be run on the local University of Calgary servers that host the THEMIS data. If you are running this code make sure you do it from within calgary-version.
+
 ## Setup
 1. When running code make sure you are in the base directory as this will ensure that all the code runs as expected.
 2. I recommend creating a new virtual environment and installing all the dependencies through pip3 with the requirements.txt file.
 
 ### System configuration
-Besides installing dependencies via the requirements file. We've tested this on a Rocky 8 VM and when doing that needed to install the package: `sudo yum intstall mesa-libGL`. 
+Besides installing dependencies via the requirements file. We've tested this on a Rocky 8 VM and when doing that needed to install the package: `sudo yum install mesa-libGL`. 
 
 There is a known issue in the themis_imager_readfile python package that can cause a memory leak. This will hopefully be fixed soon, but you can also edit the source code directly which will likely be located (if you are using a conda virtual environment) somewhere like anaconda3/envs/{environment_name}/lib/python3.11/site-packages/themis_imager_readfile/_themis.py. The fix is quite simple. Just add the following lines immediately after the `pool.map()` function call: `pool.close()` and `pool.join()`. This should fix the memory leak issue. 
 

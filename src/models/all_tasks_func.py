@@ -10,11 +10,11 @@ import os
 import themis_imager_readfile
 
 # set the folder path for stream0
-stream0_path = '/stream0'
+stream0_path = 'data/raw/testing/stream0'
 # stream0_path = 'D:\stream0'
 
 # load trained model
-model_path = './CNN_model'
+model_path = 'models/CNN_model'
 # model_path = 'F:\pa_sample_models\CNN model'
 model = load_model(
     os.path.join(model_path, 'model', 'CNN_0524.model'))
@@ -82,6 +82,7 @@ def process_image_clahe(item):
     dt = datetime.strptime(key[4:], '%Y%m%d%H%M%S')
     year, month, day = str(dt.year), str(dt.month), str(dt.day)
     directory_path = os.path.join(year, month, day)
+    directory_path = 'data/processed/ml-classifications/' + directory_path
     ymd_str = dt.strftime('%Y%m%d')
     time_str = dt.strftime('%H:%M:%S')
 

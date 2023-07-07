@@ -24,7 +24,7 @@ if __name__ == '__main__':
     print(f'code running, args = {args[1:]}')
 
     # init log file
-    logging.basicConfig(filename='all_tasks.log',
+    logging.basicConfig(filename='logs/all_tasks.log',
                         # encoding='utf-8',
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         level=logging.INFO,
@@ -62,12 +62,12 @@ if __name__ == '__main__':
     # decompress the images to a dictionary
     # address example: stream0/2011/08/08/mcgr_themis11/ut09/
     # iterate through date folders
-    for date_folder_path in subfolder_paths:  # stream0/2011/08/08
+    for date_folder_path in subfolder_paths[0:1]:  # stream0/2011/08/08
         logging.info(
             f'Processing date_folder_path = {date_folder_path}, {datetime.now().strftime("%H:%M:%S")}')
 
         # Iterate over the child folders (each camera) in the outer folder
-        for asi_name in os.listdir(date_folder_path):  # /mcgr_themis11
+        for asi_name in os.listdir(date_folder_path)[0:1]:  # /mcgr_themis11
 
             logging.info(
                 f'Processing asi = {asi_name}')
@@ -76,6 +76,7 @@ if __name__ == '__main__':
             # create csv file in advance
             directory_path = date_folder_path[-10:]
             ymd_str = (datetime.strptime(directory_path, "%Y/%m/%d")).strftime('%Y%m%d')
+            directory_path = 'data/processed/ml-classifications/' + directory_path
             if not os.path.exists(directory_path):
                 os.makedirs(directory_path)
             
@@ -110,7 +111,7 @@ if __name__ == '__main__':
                 continue
 
             # for each hour, decompress, predict, and write into txt
-            for hour in sorted(hours):
+            for hour in sorted(hours)[0:1]:
             
                 logging.info(f'Reading in images at {hour}.')
                 # camera_dict example k-v pair: {'atha20200104000206':img[:,:,:]}
