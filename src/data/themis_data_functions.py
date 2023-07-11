@@ -217,7 +217,7 @@ def themis_asi_to_hdf5_8bit_clahe(date:datetime, asi:str, save_dir:str, h5_dir:s
 
         # Name of all images in hour
         img_files = sorted(os.listdir(tmp_img_dir + hour_dir))
-        img_files = [tmp_img_dir + hour_dir + '/' + f for f in img_files]
+        img_files = sorted([tmp_img_dir + hour_dir + '/' + f for f in img_files if 'full' in f])
 
         # Add to master list
         filepathnames.append(img_files)
@@ -266,6 +266,9 @@ def themis_asi_to_hdf5_8bit_clahe(date:datetime, asi:str, save_dir:str, h5_dir:s
                 if images.shape[2] == 0:
                     logging.warning(f'No images for hour, skipping.')
                     continue
+                else:
+                    latitude = float(meta[0]['Geodetic latitude'])
+                    longitude = float(meta[0]['Geodetic Longitude'])
 
                 # Extract datetimes from file
                 datetimes = [datetime.strptime(m['Image request start'],
@@ -305,8 +308,8 @@ def themis_asi_to_hdf5_8bit_clahe(date:datetime, asi:str, save_dir:str, h5_dir:s
         # Add attributes to datasets
         time_ds.attrs['about'] = ('ISO 8601 formatted timestamp in byte string.')
         img_ds.attrs['wavelength'] = 'white'
-        img_ds.attrs['station_latitude'] = float(meta[0]['Geodetic latitude'])
-        img_ds.attrs['station_longitude'] = float(meta[0]['Geodetic Longitude'])
+        img_ds.attrs['station_latitude'] = latitude
+        img_ds.attrs['station_longitude'] = longitude
         alt_ds.attrs['about'] = 'Altitudes for different skymaps.'
         glat_ds.attrs['about'] = 'Geographic latitude at pixel corner, excluding last.'
         glon_ds.attrs['about'] = 'Geographic longitude at pixel corner, excluding last.'
