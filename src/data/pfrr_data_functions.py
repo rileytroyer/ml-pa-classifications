@@ -173,7 +173,7 @@ def read_process_img_clahe(filename:str) -> np.array:
     fits_file.close()
 
     # Image processing
-    clahe = cv2.createCLAHE(clipLimit=300, tileGridSize=(8, 8))
+    clahe = cv2.createCLAHE(clipLimit=300, tileGridSize=(4, 4))
     image = clahe.apply(image)
 
     # Scale back to 0 to 255 values and 8-bit

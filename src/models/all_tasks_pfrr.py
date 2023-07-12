@@ -23,7 +23,7 @@ if __name__ == '__main__':
     # print code start running
     print(f'code running, args = {args[1:]}')
 
-    # init log file
+    # init log filed
     logging.basicConfig(filename='logs/all_tasks_pfrr.log',
                         # encoding='utf-8',
                         format='%(asctime)s %(levelname)-8s %(message)s',

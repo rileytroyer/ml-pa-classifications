@@ -80,11 +80,11 @@ def process_image_clahe(item):
 
     try: 
         # process the image using clahe
-        clahe = cv2.createCLAHE(clipLimit=300, tileGridSize=(8, 8))
+        clahe = cv2.createCLAHE(clipLimit=300, tileGridSize=(4, 4))
         image = cv2.convertScaleAbs(clahe.apply(value), alpha=(255.0/65535.0))
         frame = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR) # convert the frame to RGB color
-        frame = cv2.resize(frame, (256, 256)).astype("float32") # resize the frame to 256 by 256 to cut the boundary
-        frame[elev_angle < angle] = 0 #cut the boundary
+        #frame = cv2.resize(frame, (256, 256)).astype("float32") # resize the frame to 256 by 256 to cut the boundary
+        #frame[elev_angle < angle] = 0 #cut the boundary
         frame = cv2.resize(frame, (224, 224)).astype("float32") # resize the frame to 224 by 224 for prediction
         return frame, directory_path, ymd_str, time_str
     except Exception as e:
